@@ -1,3 +1,4 @@
+require 'server'
 require 'data_mapper'
 
 env = ENV["RACK_ENV"] || "development"
