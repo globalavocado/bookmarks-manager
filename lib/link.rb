@@ -12,9 +12,3 @@ class Link
 	property :url, 		String
 
 end
-
-get '/' do
-	@links = Link.all
-	erb :index
-end
-

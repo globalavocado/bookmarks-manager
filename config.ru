@@ -1,4 +1,4 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), 'bookmarks.rb')
+require_relative './lib/server.rb'
 
 run Bookmarks

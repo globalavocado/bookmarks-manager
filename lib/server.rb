@@ -1,4 +1,4 @@
-require 'server'
+require 'sinatra'
 require 'data_mapper'
 
 env = ENV["RACK_ENV"] || "development"
@@ -12,3 +12,23 @@ DataMapper.finalize
 
 #However, the database tables don't exist yet. Let's tell datamapper to create them
 DataMapper.auto_upgrade!
+
+
+class Bookmarks < Sinatra::Base
+
+	set :views, Proc.new { File.join(root, "..", "views") }
+
+	get '/' do
+		@links = Link.all
+		erb :index
+	end
+
+	post '/links' do
+		# raise params.inspect
+		url   = params[:url]
+		title = params[:title]
+		Link.create(:title => title, 
+					:url   => url)
+		redirect to '/'
+	end
+end
