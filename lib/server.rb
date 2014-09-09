@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'data_mapper'
+require 'rack-flash'
 
 env = ENV["RACK_ENV"] || "development"
 # we're telling datamapper to user a postgres database on localhost. The name will be "bookmark_manager_test" or "bookmark_manager_development" depending on the environment
@@ -21,6 +22,7 @@ class Bookmarks < Sinatra::Base
 
 	enable :sessions
 	set :session_secret, 'super secret'
+	use Rack::Flash
 
 	get '/' do	
 		@links = Link.all
@@ -48,15 +50,21 @@ class Bookmarks < Sinatra::Base
 	end
 
 	get '/users/new' do
+		@user = User.new
 		erb :"users/new"
 	end
 
 	post '/users' do
-	  user = User.create(:email => params[:email], 
+	  @user = User.new(:email => params[:email], 
                      :password => params[:password],
                      :password_confirmation => params[:password_confirmation])  
-	  session[:user_id] = user.id
-	  redirect to('/')
+		if @user.save
+		  session[:user_id] = @user.id
+		  redirect to('/')
+		else
+			flash[:notice] = "Sorry, your passwords don't match"
+			erb :"users/new"
+		end
 	end
 
 
