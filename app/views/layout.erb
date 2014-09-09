@@ -5,6 +5,13 @@
 	</head>
 
 	<body>
+
+	<% if flash[:notice] %>
+    	<div id="notice">
+    		<%= flash[:notice] %>
+    	</div>
+  	<% end %>
+
 	<% if flash[:errors] && !flash[:errors].empty? %>
 		Sorry, there were the following problems with the form:
 	<ul id="errors">
@@ -15,8 +22,13 @@
 	<% end %>
 
 	<% if current_user %>
-	Welcome, <%= current_user.email %>
-	<% end %>
+    	Welcome, <%= current_user.email %>
+	    <form method="post" action="/sessions">
+	      <input type="hidden" name="_method" value="delete">
+	      <input type="submit" value="sign out">
+	    </form>
+  	<% end %>
+
 	<%= yield %>
 </body>
 

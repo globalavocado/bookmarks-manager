@@ -4,6 +4,7 @@ require 'rack-flash'
 require './lib/link' #this needs to be done after datamapper is initialised
 require './lib/tag'
 require './lib/user'
+require 'sinatra/partial'
 require_relative 'data_mapper_setup'
 # require_relative 'helpers/application'
 
@@ -15,6 +16,7 @@ class Bookmarks < Sinatra::Base
 	enable :sessions
 	set :session_secret, 'super secret'
 	use Rack::Flash
+	use Rack::MethodOverride
 
 	get '/' do	
 		@links = Link.all
@@ -54,7 +56,7 @@ class Bookmarks < Sinatra::Base
 		  session[:user_id] = @user.id
 		  redirect to('/')
 		else
-			flash[:errors] = @user.errors.full_messages
+			flash.now[:errors] = @user.errors.full_messages
 			erb :"users/new"
 		end
 	end
@@ -73,6 +75,12 @@ class Bookmarks < Sinatra::Base
 			flash[:errors] = ["The email or password is incorrect"]
 			erb :"sessions/new"
 		end
+	end
+
+	delete '/sessions' do
+		session[:user_id] = nil
+		flash[:notice] = "Good bye!"
+		redirect to('/')
 	end
 
 	helpers do
