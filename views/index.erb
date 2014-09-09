@@ -1,20 +1,16 @@
-<html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-	</head>
+<ul>
+	<% @links.each do |link| %>
+		<li><a href="<%= link.url %>"><%= link.title %></a></li>
+	<% end %>
+</ul>
 
-	<ul>
-		<% @links.each do |link| %>
-			<li><a href="<%= link.url %>"><%= link.title %></a></li>
-		<% end %>
-	</ul>
+<div id="new-link">
+	<form action="/links" method="POST">
+		URL: <input type="text" name="url">
+		Title: <input type="text" name="title">
+		Tags: <input type="text" name="tags">
+		<input type="submit" value="add link">
+	</form>
+</div>
 
-	<div id="new-link">
-		<form action="/links" method="POST">
-			URL: <input type="text" name="url">
-			Title: <input type="text" name="title">
-			Tags: <input type="text" name="tags">
-			<input type="submit" value="add link">
-		</form>
-	</div>
-</html>
+
