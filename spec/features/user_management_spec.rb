@@ -2,6 +2,7 @@ require 'spec_helper'
 
 feature "User signs up" do
 
+
   # Strictly speaking, the tests that check the UI 
   # (have_content, etc.) should be separate from the tests 
   # that check what we have in the DB. The reason is that 
@@ -23,6 +24,12 @@ feature "User signs up" do
     expect { sign_up('a@a.com', 'pass', 'wrong') }.to change(User, :count).by(0)
     expect(current_path).to eq('/users')
     expect(page).to have_content("Sorry, your passwords don't match")
+  end
+
+  scenario "with an email that is already registered" do
+    lambda { sign_up }.should change(User, :count).by(1)
+    lambda { sign_up }.should change(User, :count).by(0)
+    expect(page).to have_content("This email is already taken")
   end
 
   def sign_up(email = "alice@example.com", 
