@@ -1,4 +1,4 @@
 require 'rubygems'
-require_relative './lib/server.rb'
+require_relative './app/server.rb'
 
 run Bookmarks
