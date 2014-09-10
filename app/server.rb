@@ -5,6 +5,8 @@ require './lib/link' #this needs to be done after datamapper is initialised
 require './lib/tag'
 require './lib/user'
 require 'rest_client'
+require 'mailgun'
+
 require_relative 'data_mapper_setup'
 # require_relative 'helpers/application'
 
@@ -66,21 +68,25 @@ class Bookmarks < Sinatra::Base
 		end
 	end
 
-	get '/users/reset_password' do
-		erb :"users/password_recovery"
+	get '/users/password_reset_request' do
+		erb :"users/password_reset_request"
 	end
 
 	post '/users/password_reset_request' do
 		user = User.first(:email => params[:email])
-		user.password_token = (1..64).map{('A'..'Z').to_a.sample}.join
+		user.password_token = (1..9).map{('A'..'F').to_a.sample}.join
 		user.password_token_timestamp = Time.now
 		user.save
-		send_message
-		redirect to('/sessions/new')
+		send_message(params[:email], user.password_token)
+		redirect to('sessions/new')
 	end
 
-	get '' do
-		
+	get '/users/reset_password' do
+		erb :"users/password_reset_confirmation"
+	end
+
+	post '/users/reset_password/:token' do
+		# user = User.first(:password_token => params[:token])
 	end
 
 	get '/sessions/new' do
@@ -110,12 +116,12 @@ class Bookmarks < Sinatra::Base
 	    @current_user ||= User.get(session[:user_id]) if session[:user_id]
 	  end
 
-	  def send_message(email, password_token)
+	  def send_message(user_email, password_token)
 			RestClient.post API_URL+"/messages",
 	    :from => "my@mail.com",
-	    :to => email,
+	    :to => user_email,
 	    :subject => "Password Recovery",
-	    :text => "Please click this link, to recover your password /users/reset_password/#{password_token}!"
+	    :text => "Please click the following link, to recover your password: http://secret-brushlands-2777.herokuapp.com/users/reset_password/#{password_token}!"
 		end
 	end
 

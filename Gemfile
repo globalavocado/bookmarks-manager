@@ -6,6 +6,8 @@ gem 'data_mapper'
 gem 'dm-postgres-adapter'
 gem 'bcrypt-ruby'
 gem 'rest-client'
+gem 'mailgun'
+
 
 group :development, :test do
 	gem 'rspec'
