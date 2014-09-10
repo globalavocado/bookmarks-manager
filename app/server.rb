@@ -4,7 +4,6 @@ require 'rack-flash'
 require './lib/link' #this needs to be done after datamapper is initialised
 require './lib/tag'
 require './lib/user'
-require 'sinatra/partial'
 require_relative 'data_mapper_setup'
 # require_relative 'helpers/application'
 
@@ -61,7 +60,11 @@ class Bookmarks < Sinatra::Base
 		end
 	end
 
+<<<<<<< HEAD
 	get 'users/reset_password/:token'
+=======
+	get 'users/reset_password/:token' do
+>>>>>>> d322e8db1e3e28e32e7f8bc704d49639244e2a12
 		user = User.first(:email => email)
 		user.password_token = (1..64).map{('A'..'Z').to_a.sample}.join
 		user.password_token_timestamp = Time.now
@@ -69,6 +72,11 @@ class Bookmarks < Sinatra::Base
 	end
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> d322e8db1e3e28e32e7f8bc704d49639244e2a12
 	get '/sessions/new' do
 		erb :"sessions/new"
 	end
