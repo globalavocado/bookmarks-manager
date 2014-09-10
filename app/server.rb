@@ -78,15 +78,19 @@ class Bookmarks < Sinatra::Base
 		user.password_token_timestamp = Time.now
 		user.save
 		send_message(params[:email], user.password_token)
+		flash[:notice] = "Please check your email to complete your password reset!"
 		redirect to('sessions/new')
 	end
 
-	get '/users/reset_password' do
+	get '/users/reset_password/:token' do
 		erb :"users/password_reset_confirmation"
 	end
 
-	post '/users/reset_password/:token' do
-		# user = User.first(:password_token => params[:token])
+	post '/users/reset_password' do
+		user = User.first(:password_token => params[:token])
+		user.password=(params[:password])
+		flash[:notice] = "Your password has been reset, please sign in!"
+		redirect to('sessions/new')
 	end
 
 	get '/sessions/new' do
