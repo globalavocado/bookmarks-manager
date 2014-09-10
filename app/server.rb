@@ -4,6 +4,7 @@ require 'rack-flash'
 require './lib/link' #this needs to be done after datamapper is initialised
 require './lib/tag'
 require './lib/user'
+require 'rest_client'
 require_relative 'data_mapper_setup'
 # require_relative 'helpers/application'
 
@@ -11,6 +12,9 @@ require_relative 'data_mapper_setup'
 DataMapper.auto_upgrade!
 
 class Bookmarks < Sinatra::Base
+
+	API_KEY = ENV['MAILGUN_API_KEY']
+	API_URL = "https://api:#{API_KEY}@api.mailgun.net/v2/app29425848.mailgun.org"
 
 	enable :sessions
 	set :session_secret, 'super secret'
@@ -60,7 +64,7 @@ class Bookmarks < Sinatra::Base
 		end
 	end
 
-	get 'users/reset_password/:token'
+	get 'users/reset_password/:token' do
 		user = User.first(:email => email)
 		user.password_token = (1..64).map{('A'..'Z').to_a.sample}.join
 		user.password_token_timestamp = Time.now
@@ -89,10 +93,21 @@ class Bookmarks < Sinatra::Base
 		redirect to('/')
 	end
 
+
+
 	helpers do
 	  def current_user    
 	    @current_user ||= User.get(session[:user_id]) if session[:user_id]
 	  end
+
+	  def send_message
+			RestClient.post API_URL+"/messages",
+	    :from => "ev@example.com",
+	    :to => "ev@mailgun.net",
+	    :subject => "This is subject",
+	    :text => "Text body",
+	    :html => "<b>HTML</b> version of the body!"
+		end
 	end
 
 end
