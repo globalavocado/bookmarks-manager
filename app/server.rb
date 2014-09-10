@@ -54,7 +54,9 @@ class Bookmarks < Sinatra::Base
 	post '/users' do
 	  @user = User.new(:email => params[:email], 
                      :password => params[:password],
-                     :password_confirmation => params[:password_confirmation])  
+                     :password_confirmation => params[:password_confirmation],
+                     :password_token => nil,
+                     :password_token_timestamp => nil)  
 		if @user.save
 		  session[:user_id] = @user.id
 		  redirect to('/')
@@ -64,11 +66,21 @@ class Bookmarks < Sinatra::Base
 		end
 	end
 
-	get 'users/reset_password/:token' do
-		user = User.first(:email => email)
+	get '/users/reset_password' do
+		erb :"users/password_recovery"
+	end
+
+	post '/users/password_reset_request' do
+		user = User.first(:email => params[:email])
 		user.password_token = (1..64).map{('A'..'Z').to_a.sample}.join
 		user.password_token_timestamp = Time.now
 		user.save
+		send_message
+		redirect to('/sessions/new')
+	end
+
+	get '' do
+		
 	end
 
 	get '/sessions/new' do
@@ -93,20 +105,17 @@ class Bookmarks < Sinatra::Base
 		redirect to('/')
 	end
 
-
-
 	helpers do
 	  def current_user    
 	    @current_user ||= User.get(session[:user_id]) if session[:user_id]
 	  end
 
-	  def send_message
+	  def send_message(email, password_token)
 			RestClient.post API_URL+"/messages",
-	    :from => "ev@example.com",
-	    :to => "ev@mailgun.net",
-	    :subject => "This is subject",
-	    :text => "Text body",
-	    :html => "<b>HTML</b> version of the body!"
+	    :from => "my@mail.com",
+	    :to => email,
+	    :subject => "Password Recovery",
+	    :text => "Please click this link, to recover your password /users/reset_password/#{password_token}!"
 		end
 	end
 
